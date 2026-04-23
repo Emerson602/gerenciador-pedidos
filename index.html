@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard de Pedidos</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-100 p-6">
+
+  
+  
+  <button onclick="abrirModal()" 
+    class="bg-black text-white px-4 py-2 rounded mb-4">
+    📊 Gráficos
+  </button>   
+
+  <button id="btnPainel" onclick="togglePainel()" 
+    class="bg-gray-700 text-white px-4 py-2 rounded mb-4 w-full sm:w-auto">
+    ⚙️ Esconder Painel
+  </button>
+
+  <div class="max-w-5xl mx-auto">
+
+    <h1 class="text-3xl font-bold mb-6">📦 Controle de Pedidos</h1>
+
+    <div id="painelControle" class="bg-white p-4 rounded-2xl shadow mb-6">
+      <div class="flex gap-2 flex-wrap">
+        <input id="pedido" placeholder="Número do pedido"
+          class="border p-2 rounded w-48" /> 
+
+
+
+        <button onclick="criarPedido()" class="bg-blue-500 text-white px-4 py-2 rounded">Criar</button>
+        <button onclick="acao('recebido')" class="bg-yellow-500 text-white px-4 py-2 rounded">Recebido</button>
+        <button onclick="acao('pronto')" class="bg-green-500 text-white px-4 py-2 rounded">Pronto</button>
+        <button onclick="acao('chamei')" class="bg-orange-500 text-white px-4 py-2 rounded">Chamei</button> 
+
+        <select id="entregador" class="border p-2 rounded">
+          <option selected></option>
+          <option>Miqueias</option>
+          <option>Ivan</option>
+          <option>Bruno</option>
+          <option>Lucas</option>
+          <option>Gustavo</option>
+          <option>Extra</option>
+        </select>
+        
+        <button onclick="acao('saiu')" class="bg-red-500 text-white px-4 py-2 rounded">Saiu</button>
+
+        <input id="observacao" placeholder="Observação"
+          class="border p-2 rounded w-64" />  
+      </div>
+    </div>
+
+    <div id="lista" class="space-y-4"></div>
+
+  </div>
+
+  <!-- MODAL -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold">📊 Desempenho dos Pedidos</h2>
+        <button onclick="fecharModal()" class="text-red-500">✖</button>
+      </div>
+
+      <canvas id="grafico"></canvas>
+      <div id="medias" class="mt-4 text-sm font-semibold"></div>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- JS -->
+   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="script.js"></script>
+
+
+</body>
+</html>
