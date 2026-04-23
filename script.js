@@ -2,6 +2,15 @@
 const API = "https://api-pedidos-dlw2.onrender.com/";
 const socket = io(API);
 
+function atualizarPeriodicamente() {
+  carregarPedidosDoBanco();
+
+  setTimeout(atualizarPeriodicamente, 300000); // 120s
+}
+
+// iniciar
+atualizarPeriodicamente();
+
 let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
 let chart;
 
