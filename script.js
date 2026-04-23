@@ -1,5 +1,5 @@
 //mongodb+srv://admin:0MizazU0MYQQKSFy@pedidos.t5lnil0.mongodb.net/?appName=pedidos
-const API = "http://localhost:3000";
+const API = "https://api-pedidos-dlw2.onrender.com/";
 const socket = io(API);
 
 let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
