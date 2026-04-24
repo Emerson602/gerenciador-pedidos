@@ -6,9 +6,9 @@ let chart;
 // 🔄 atualização automática (2 min)
 function atualizarPeriodicamente() {
   carregarPedidosDoBanco();
-  setTimeout(atualizarPeriodicamente, 120000);
-
+  setTimeout(atualizarPeriodicamente, 120000); 
 }
+
 atualizarPeriodicamente();
 
 // 📥 carregar pedidos
@@ -193,44 +193,49 @@ function render() {
       <div class="bg-white p-4 rounded-xl shadow">
 
         <div class="flex justify-between">
-          <b>Pedido ${p.pedido}</b>
+          <b>Pedido: ${p.pedido}</b>
           <span>${p.data || "-"}</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
 
-        <div class="${tempoPreparo >= 15 ? 'text-red-500 font-bold' : ''}">
+        <div class="m-2 text-base ${tempoPreparo >= 15 ? 'text-red-500 font-bold' : ''}">
           ⏱️ Tempo de preparo: ${tempoPreparo !== null ? tempoPreparo + ' min' : '-'}
         </div> 
 
-        <div class="${tempoCaixa >= 10 ? 'text-red-500 font-bold' : ''}">
-          💬 Tempo para organizar o pedido: ${tempoCaixa !== null ? tempoCaixa + ' min' : '-'}
+        <div class="m-2 text-base ${tempoCaixa >= 10 ? 'text-red-500 font-bold' : ''}">
+          💬 Tempo de organizar o pedido: ${tempoCaixa !== null ? tempoCaixa + ' min' : '-'}
         </div>
 
-        <div class="${tempoEntrega >= 10 ? 'text-red-500 font-bold' : ''}">
+        <div class="m-2 text-base ${tempoEntrega >= 10 ? 'text-red-500 font-bold' : ''}">
           🛵 Tempo do entregador: ${tempoEntrega !== null ? tempoEntrega + ' min' : '-'}
         </div>
 
       </div>
 
-        <div onclick="editarCampo(${index}, 'recebido')" class="cursor-pointer">
+      <div class="flex flex-row flex-wrap">
+        <div onclick="editarCampo(${index}, 'recebido')" class="m-2 cursor-pointer">
           <strong>Pedido recebido:</strong> ${p.recebido || '-'}
         </div>
 
-        <div onclick="editarCampo(${index}, 'pronto')" class="cursor-pointer">
+        <div onclick="editarCampo(${index}, 'pronto')" class="m-2 cursor-pointer">
           <strong>Pedido pronto:</strong> ${p.pronto || '-'}
         </div>
 
-        <div onclick="editarCampo(${index}, 'chamei')" class="cursor-pointer">
+        <div onclick="editarCampo(${index}, 'chamei')" class="m-2 cursor-pointer">
           <strong>Chamei motoboy:</strong> ${p.chamei || '-'}
         </div>
 
-        <div onclick="editarCampo(${index}, 'saiu')" class="cursor-pointer">
+        <div onclick="editarCampo(${index}, 'saiu')" class="m-2 cursor-pointer">
           <strong>Saiu para entrega:</strong> ${p.saiu || '-'}
         </div>
-
-        <div>
+      </div>
+        <div class="m-2">
           <strong>Motoboy:</strong> ${p.entregador || '-'}
+        </div>
+
+        <div onclick="editarCampo(${index}, 'observacao')" class="m-2 cursor-pointer">
+          <strong>Observação:</strong> ${p.observacao || '-'}
         </div>
 
         <div class="flex gap-2 mt-2">
