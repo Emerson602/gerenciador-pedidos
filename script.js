@@ -199,17 +199,41 @@ function render() {
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
 
-        <div class="m-2 text-base ${tempoPreparo >= 15 ? 'text-red-500 font-bold' : ''}">
-          ⏱️ Tempo de preparo: ${tempoPreparo !== null ? tempoPreparo + ' min' : '-'}
-        </div> 
+          <div class="relative group m-2">
+            <div class="text-base ${tempoPreparo >= 15 ? 'text-red-500 font-bold' : ''}">
+              ⏱️ Preparo (cozinha): ${tempoPreparo !== null ? tempoPreparo + ' min' : '-'}
+            </div>
 
-        <div class="m-2 text-base ${tempoCaixa >= 10 ? 'text-red-500 font-bold' : ''}">
-          💬 Tempo de organizar o pedido: ${tempoCaixa !== null ? tempoCaixa + ' min' : '-'}
-        </div>
+            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 
+                        transition duration-200 bg-black text-white text-xs px-2 py-1 rounded 
+                        max-w-[90vw] text-center break-words">
+              Tempo que o pedido levou para ficar pronto
+            </div>
+          </div>
 
-        <div class="m-2 text-base ${tempoEntrega >= 10 ? 'text-red-500 font-bold' : ''}">
-          🛵 Tempo do entregador: ${tempoEntrega !== null ? tempoEntrega + ' min' : '-'}
-        </div>
+          <div class="relative group m-2">
+            <div class="text-base ${tempoCaixa >= 10 ? 'text-red-500 font-bold' : ''}">
+              💬 Organização (caixa): ${tempoCaixa !== null ? tempoCaixa + ' min' : '-'}
+            </div>
+
+            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 
+                        transition duration-200 bg-black text-white text-xs px-2 py-1 rounded 
+                        max-w-[90vw] text-center break-words">
+              Tempo que o caixa levou para organizar os pedidos e chamar o motoboy
+            </div>
+          </div>
+
+          <div class="relative group m-2">
+            <div class="text-base ${tempoEntrega >= 10 ? 'text-red-500 font-bold' : ''}">
+              🛵 Saida (motoboy): ${tempoEntrega !== null ? tempoEntrega + ' min' : '-'}
+            </div>
+
+            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 
+                        transition duration-200 bg-black text-white text-xs px-2 py-1 rounded 
+                        max-w-[90vw] text-center break-words">
+              Tempo que o motoboy levou para sair, a partir do momento em que foi chamado pelo caixa
+            </div>
+          </div>
 
       </div>
 
@@ -238,7 +262,7 @@ function render() {
           <strong>Observação:</strong> ${p.observacao || '-'}
         </div>
 
-        <div class="flex gap-2 mt-2">
+        <div class="flex flex-row flex-wrap gap-2 mt-2">
         <button onclick="acao(${index}, 'recebido')" class="rounded-lg bg-yellow-500 text-white p-2">Pedido recebido</button>
         <button onclick="acao(${index}, 'pronto')" class="rounded-lg bg-green-500 text-white p-2">Pedido ficou pronto</button>
         <button onclick="acao(${index}, 'chamei')" class="rounded-lg bg-orange-500 text-white p-2">Chamei entregador</button>
