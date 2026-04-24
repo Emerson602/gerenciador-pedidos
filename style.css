@@ -63,3 +63,43 @@
 .container-logo img {
   margin: auto;
 }
+
+.container-painel {
+  width: auto;
+  padding: 20px;
+}
+
+.container-painel input {
+  width: 250px;
+  height: 50px;
+  text-align: center;
+}
+
+.container-painel button {
+  width: 100px;
+  height: 50px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+
+  .container-painel {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+  }
+
+  .container-painel input {
+  width: 90%;
+  height: 50px;
+  text-align: center;
+}
+
+.container-painel button {
+  width: 90%;
+  height: 50px;
+  margin: 10px 0 0 0;
+  text-align: center;
+}
+
+}
