@@ -112,14 +112,22 @@ function gerarGrafico() {
   const media = arr =>
     arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : 0;
 
-  let html = `
-    ⏱️ Tempo médio cozinha: ${media(preparoArr)} min<br>
-    💬 Tempo médio caixa: ${media(caixaArr)} min<br>
-  `;
+function corMedia(valor, limite) {
+  if (valor === null || valor === undefined || isNaN(valor)) return '-';
 
-  Object.keys(entregadores).forEach(nome => {
-    html += `🛵 Tempo médio ${nome}: ${media(entregadores[nome])} min<br>`;
-  });
+  return valor >= limite
+    ? `<span class="text-red-500 font-bold">${valor}</span>`
+    : valor;
+}
+
+let html = `
+  ⏱️ Tempo médio (Cozinha): ${corMedia(media(preparoArr), 15)} min<br>
+  💬 Tempo médio (Caixa): ${corMedia(media(caixaArr), 10)} min<br>
+`;
+
+Object.keys(entregadores).forEach(nome => {
+  html += `🛵 Tempo médio (${nome}): ${corMedia(media(entregadores[nome]), 10)} min<br>`;
+});
 
   document.getElementById("medias").innerHTML = html;
 }
