@@ -113,12 +113,12 @@ function gerarGrafico() {
     arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : 0;
 
   let html = `
-    ⏱️ Cozinha: ${media(preparoArr)} min<br>
-    💬 Caixa: ${media(caixaArr)} min<br>
+    ⏱️ Tempo médio cozinha: ${media(preparoArr)} min<br>
+    💬 Tempo médio caixa: ${media(caixaArr)} min<br>
   `;
 
   Object.keys(entregadores).forEach(nome => {
-    html += `🛵 ${nome}: ${media(entregadores[nome])} min<br>`;
+    html += `🛵 Tempo médio ${nome}: ${media(entregadores[nome])} min<br>`;
   });
 
   document.getElementById("medias").innerHTML = html;
