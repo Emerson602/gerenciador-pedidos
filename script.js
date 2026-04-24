@@ -1,64 +1,28 @@
-//mongodb+srv://admin:0MizazU0MYQQKSFy@pedidos.t5lnil0.mongodb.net/?appName=pedidos
-const API = "https://api-pedidos-dlw2.onrender.com/";
-const socket = io(API);
+const API = "https://api-pedidos-dlw2.onrender.com";
 
-function atualizarPeriodicamente() {
-  carregarPedidosDoBanco();
-
-  setTimeout(atualizarPeriodicamente, 300000); // 120s
-}
-
-// iniciar
-atualizarPeriodicamente();
-
-let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+let pedidos = [];
 let chart;
 
-// 🔄 tempo real
-socket.on("pedidosAtualizados", () => {
-  console.log("🔄 Atualização em tempo real");
+// 🔄 atualização automática (2 min)
+function atualizarPeriodicamente() {
   carregarPedidosDoBanco();
-});
+  setTimeout(atualizarPeriodicamente, 120000);
+}
+atualizarPeriodicamente();
 
-// 📥 carrega do banco
+// 📥 carregar pedidos
 async function carregarPedidosDoBanco() {
   try {
     const res = await axios.get(API + "/pedidos");
     pedidos = res.data;
-
-    salvarLocal(); // opcional (cache)
     render();
-
-    console.log("📥 Dados carregados do banco");
   } catch (err) {
     console.error("❌ Erro ao carregar pedidos:", err);
   }
 }
 
-// 🔥 chama ao iniciar
+// iniciar
 carregarPedidosDoBanco();
-
-// 📤 sincroniza com backend
-async function sincronizarComAPI() {
-  try {
-    await fetch(API + "/pedidos/sync", { // ✅ corrigido aqui
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(pedidos)
-    });
-
-    console.log("✅ Sincronizado com banco");
-  } catch (err) {
-    console.error("❌ Erro ao sincronizar", err);
-  }
-}
-
-// 💾 cache local (opcional)
-function salvarLocal() {
-  localStorage.setItem("pedidos", JSON.stringify(pedidos));
-}
 
 function dataHoje() {
   return new Date().toLocaleDateString('pt-BR', {
@@ -68,8 +32,10 @@ function dataHoje() {
 }
 
 function horaAgora() {
-  const agora = new Date();
-  return agora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return new Date().toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
 }
 
 // MODAL
@@ -98,7 +64,6 @@ function gerarGrafico() {
     if (preparo !== null) preparoArr.push(preparo);
     if (caixa !== null) caixaArr.push(caixa);
 
-    // 👇 separa por entregador
     if (entregadorTempo !== null && p.entregador) {
       if (!entregadores[p.entregador]) {
         entregadores[p.entregador] = [];
@@ -114,74 +79,51 @@ function gerarGrafico() {
   const ctx = document.getElementById("grafico");
 
   const datasets = [
-  {
-    label: "Preparo",
-    data: preparoArr,
-    backgroundColor: "#B0C4DE",
-    borderColor: "#B0C4DE",
-    borderWidth: 1
-  },
-  {
-    label: "Caixa",
-    data: caixaArr,
-    backgroundColor: "#556B2F",
-    borderColor: "#556B2F",
-    borderWidth: 1
-  }
+    {
+      label: "Preparo",
+      data: preparoArr,
+      backgroundColor: "#B0C4DE"
+    },
+    {
+      label: "Caixa",
+      data: caixaArr,
+      backgroundColor: "#556B2F"
+    }
   ];
 
-  // 👇 cria uma linha para cada entregador
-    Object.keys(entregadores).forEach(nome => {
+  Object.keys(entregadores).forEach(nome => {
     const cor = `hsl(${Math.random() * 360}, 70%, 50%)`;
 
     datasets.push({
-        label: `Entregador - ${nome}`,
-        data: entregadores[nome],
-        borderColor: cor,
-        backgroundColor: cor,
-        borderWidth: 2
+      label: `Entregador - ${nome}`,
+      data: entregadores[nome],
+      borderColor: cor,
+      backgroundColor: cor
     });
-    });
+  });
 
-chart = new Chart(ctx, {
-  type: "bar",
-  data: {
-    labels,
-    datasets
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top"
-      }
-    },
-    scales: {
-      y: {
-        beginAtZero: true
-      }
-    }
-  }
-});
+  chart = new Chart(ctx, {
+    type: "bar",
+    data: { labels, datasets },
+    options: { responsive: true }
+  });
 
-  // 📊 médias
-  const media = arr => arr.length
-    ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1)
-    : 0;
+  const media = arr =>
+    arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : 0;
 
   let html = `
-    ⏱️ Tempo médio cozinha: ${media(preparoArr)} min<br>
-    💬 Tempo médio Caixa: ${media(caixaArr)} min<br>
+    ⏱️ Cozinha: ${media(preparoArr)} min<br>
+    💬 Caixa: ${media(caixaArr)} min<br>
   `;
 
-  // 👇 média por entregador
   Object.keys(entregadores).forEach(nome => {
-    html += `🛵Tempo médio ${nome}: ${media(entregadores[nome])} min<br>`;
+    html += `🛵 ${nome}: ${media(entregadores[nome])} min<br>`;
   });
 
   document.getElementById("medias").innerHTML = html;
 }
 
+// PAINEL
 function togglePainel() {
   const painel = document.getElementById("painelControle");
   const btn = document.getElementById("btnPainel");
@@ -191,36 +133,48 @@ function togglePainel() {
   const escondido = painel.classList.contains("hidden");
   localStorage.setItem("painelHidden", escondido);
 
-  btn.innerText = escondido 
-    ? "⚙️ Mostrar Painel" 
+  btn.innerText = escondido
+    ? "⚙️ Mostrar Painel"
     : "⚙️ Esconder Painel";
 }
 
-// ao carregar
-window.onload = () => {
-  const painel = document.getElementById("painelControle");
-  const btn = document.getElementById("btnPainel");
+async function editarCampo(index, campo) {
+  const p = pedidos[index];
+  if (!p) return;
 
-  const escondido = localStorage.getItem("painelHidden") === "true";
+  const novo = prompt(`Editar ${campo}:`, p[campo] || "");
 
-  if (escondido) {
-    painel.classList.add("hidden");
-    btn.innerText = "⚙️ Mostrar Painel";
-  }
-};
+  if (novo === null) return;
 
-function togglePainel() {
-  const painel = document.getElementById("painelControle");
-  const btn = document.getElementById("btnPainel");
+  try {
+    const res = await fetch(API + "/pedidos/" + p._id, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        ...p,
+        [campo]: novo
+      })
+    });
 
-  painel.classList.toggle("hidden");
+    const atualizado = await res.json();
 
-  if (painel.classList.contains("hidden")) {
-    btn.innerText = "⚙️ Mostrar Painel";
-  } else {
-    btn.innerText = "⚙️ Esconder Painel";
+    pedidos[index] = atualizado;
+
+    render();
+
+  } catch (err) {
+    console.error("Erro ao editar:", err);
   }
 }
+
+window.onload = () => {
+  const escondido = localStorage.getItem("painelHidden") === "true";
+  if (escondido) {
+    document.getElementById("painelControle").classList.add("hidden");
+  }
+};
 
 // TABELA
 function render() {
@@ -230,204 +184,174 @@ function render() {
   [...pedidos].reverse().forEach((p, indexOriginal) => {
     const index = pedidos.length - 1 - indexOriginal;
 
-    const preparo = calcularMinutos(p.recebido, p.pronto);
-    const entregador = calcularMinutos(p.chamei, p.saiu);
-    const caixa = calcularMinutos(p.pronto, p.chamei);
+      const tempoPreparo = calcularMinutos(p.recebido, p.pronto);
+      const tempoCaixa = calcularMinutos(p.pronto, p.chamei);
+      const tempoEntrega = calcularMinutos(p.chamei, p.saiu);
 
     lista.innerHTML += `
-      <div class="bg-white shadow rounded-xl p-4 flex flex-col gap-2">
+      <div class="bg-white p-4 rounded-xl shadow">
 
-        <!-- TOPO -->
-        <div class="flex justify-between items-center">
-          <span class="font-bold">Pedido ${p.pedido}</span>
-          <span class="text-gray-500 text-sm">${p.data || '-'}</span>
+        <div class="flex justify-between">
+          <b>Pedido ${p.pedido}</b>
+          <span>${p.data || "-"}</span>
         </div>
 
-        <!-- TEMPOS -->
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
-          <div class="${preparo >= 15 ? 'text-red-500 font-bold' : ''}">
-            <strong>Tempo de preparo:</strong> ${formatarTempo(preparo)}
-          </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
 
-          <div class="${entregador >= 10 ? 'text-red-500 font-bold' : ''}">
-            <strong>Tempo de saida motoboy:</strong> ${formatarTempo(entregador)}
-          </div>
+        <div class="${tempoPreparo >= 15 ? 'text-red-500 font-bold' : ''}">
+          ⏱️ Tempo de preparo: ${tempoPreparo !== null ? tempoPreparo + ' min' : '-'}
+        </div> 
 
-          <div class="${caixa >= 10 ? 'text-red-500 font-bold' : ''}">
-            <strong>Tempo de preparo caixa:</strong> ${formatarTempo(caixa)}
-          </div>
+        <div class="${tempoCaixa >= 10 ? 'text-red-500 font-bold' : ''}">
+          💬 Tempo para organizar o pedido: ${tempoCaixa !== null ? tempoCaixa + ' min' : '-'}
         </div>
 
-        <!-- STATUS -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-          <div onclick="editar(${index}, 'recebido')" class="cursor-pointer">
-            <strong>Pedido recebido:</strong> ${p.recebido || '-'}
-          </div>
-
-          <div onclick="editar(${index}, 'pronto')" class="cursor-pointer">
-            <strong>Pedido ficou pronto:</strong> ${p.pronto || '-'}
-          </div>
-
-          <div onclick="editar(${index}, 'chamei')" class="cursor-pointer">
-            <strong>Chamei motoboy:</strong> ${p.chamei || '-'}
-          </div>
-
-          <div onclick="editar(${index}, 'saiu')" class="cursor-pointer">
-            <strong>Saiu para entrega:</strong> ${p.saiu || '-'}
-          </div>
+        <div class="${tempoEntrega >= 10 ? 'text-red-500 font-bold' : ''}">
+          🛵 Tempo do entregador: ${tempoEntrega !== null ? tempoEntrega + ' min' : '-'}
         </div>
 
-        <!-- ENTREGADOR -->
-        <div onclick="editar(${index}, 'entregador')" class="cursor-pointer text-sm">
+      </div>
+
+        <div onclick="editarCampo(${index}, 'recebido')" class="cursor-pointer">
+          <strong>Pedido recebido:</strong> ${p.recebido || '-'}
+        </div>
+
+        <div onclick="editarCampo(${index}, 'pronto')" class="cursor-pointer">
+          <strong>Pedido pronto:</strong> ${p.pronto || '-'}
+        </div>
+
+        <div onclick="editarCampo(${index}, 'chamei')" class="cursor-pointer">
+          <strong>Chamei motoboy:</strong> ${p.chamei || '-'}
+        </div>
+
+        <div onclick="editarCampo(${index}, 'saiu')" class="cursor-pointer">
+          <strong>Saiu para entrega:</strong> ${p.saiu || '-'}
+        </div>
+
+        <div>
           <strong>Motoboy:</strong> ${p.entregador || '-'}
         </div>
 
-        <!-- OBS -->
-        <div onclick="editar(${index}, 'observacao')" class="cursor-pointer text-sm">
-          <strong>Obs:</strong> ${p.observacao || '-'}
+        <div class="flex gap-2 mt-2">
+        <button onclick="acao(${index}, 'recebido')" class="rounded-lg bg-yellow-500 text-white p-2">Pedido recebido</button>
+        <button onclick="acao(${index}, 'pronto')" class="rounded-lg bg-green-500 text-white p-2">Pedido ficou pronto</button>
+        <button onclick="acao(${index}, 'chamei')" class="rounded-lg bg-orange-500 text-white p-2">Chamei entregador</button>
+        <button onclick="acao(${index}, 'saiu')" class="rounded-lg bg-red-500 text-white p-2">Saiu para entrega</button>
+
+        <select class="border-2 border-black rounded-lg p-2" onchange="setEntregador(${index}, this.value)">
+          <option value=""></option>
+          <option ${p.entregador === 'Miqueias' ? 'selected' : ''}>Miqueias</option>
+          <option ${p.entregador === 'Ivan' ? 'selected' : ''}>Ivan</option>
+          <option ${p.entregador === 'Bruno' ? 'selected' : ''}>Bruno</option>
+          <option ${p.entregador === 'Lucas' ? 'selected' : ''}>Lucas</option>
+          <option ${p.entregador === 'Gustavo' ? 'selected' : ''}>Gustavo</option>
+          <option ${p.entregador === 'Extra' ? 'selected' : ''}>Extra</option>
+        </select>
+
+          
         </div>
 
-        <!-- AÇÕES -->
-        <div class="flex gap-2 mt-2">
-          <button onclick="remover(${index})"
-            class="bg-red-500 text-white px-2 py-1 rounded">
-            Excluir
-          </button>
-        </div>
+        <button onclick="remover(${index})" class="rounded-lg bg-red-600 text-white mt-2 p-2">Excluir</button>
 
       </div>
     `;
   });
 }
 
-// FUNÇÕES
-function criarPedido() {
+// CRIAR
+async function criarPedido() {
   const pedido = document.getElementById("pedido").value;
-  const observacao = document.getElementById("observacao").value;
 
-  pedidos.push({ 
-    pedido, 
-    data: dataHoje(),
-    observacao 
+  if (!pedido) return alert("Digite o pedido");
+
+  await fetch(API + "/pedidos", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      pedido,
+      data: dataHoje()
+    })
   });
 
-  salvarLocal();
-  render();
-  sincronizarComAPI()
+  document.getElementById("pedido").value = "";
+  carregarPedidosDoBanco();
 }
 
-function acao(tipo) {
-  const pedido = document.getElementById("pedido").value;
-  const valor = horaAgora();
-
-  const p = pedidos.find(p => p.pedido === pedido);
-
-  if (p) {
-    if (p[tipo]) return;
-
-    p[tipo] = valor;
-    salvarLocal();
-    sincronizarComAPI()
-    render();
-  }
-}
-
-function setEntregador() {
-  const pedido = document.getElementById("pedido").value;
-  const entregador = document.getElementById("entregador").value;
-
-  const p = pedidos.find(p => p.pedido === pedido);
+// AÇÃO
+async function acao(index, tipo) {
+  const p = pedidos[index];
   if (!p) return;
 
-  p.entregador = entregador;
-
-  salvarLocal();
-  sincronizarComAPI(); // 🔥 adicionar isso
-  render();
-}
-
-async function editar(index, campo) {
-  const novo = prompt("Editar:", pedidos[index][campo] || "");
-  if (novo === null) return;
-
-  const pedido = pedidos[index];
-
-  // ⚠️ garante que tem ID do Mongo
-  if (!pedido._id) {
-    console.warn("Pedido sem _id, não pode atualizar no banco");
-    return;
-  }
+  const hora = horaAgora();
 
   try {
-    // atualiza no backend
-    const res = await fetch(API + "/pedidos/" + pedido._id, {
+    const res = await fetch(API + "/pedidos/" + p._id, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        ...pedido,
-        [campo]: novo
+        ...p,
+        [tipo]: hora
       })
     });
 
     const atualizado = await res.json();
 
-    // atualiza local com retorno do banco
     pedidos[index] = atualizado;
 
-    salvarLocal();
     render();
 
-    console.log("✏️ Pedido atualizado");
   } catch (err) {
-    console.error("❌ Erro ao editar:", err);
+    console.error("Erro na ação:", err);
   }
 }
-
-async function remover(index) {
-  const pedido = pedidos[index];
+// ENTREGADOR
+async function setEntregador(index, entregador) {
+  const p = pedidos[index];
+  if (!p) return;
 
   try {
-    // 🔥 deleta no backend
-    await fetch(API + "/pedidos/" + pedido._id, {
-      method: "DELETE"
+    const res = await fetch(API + "/pedidos/" + p._id, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        ...p,
+        entregador
+      })
     });
 
-    // remove local
-    pedidos.splice(index, 1);
+    const atualizado = await res.json();
 
-    salvarLocal();
+    pedidos[index] = atualizado;
+
     render();
 
-    console.log("🗑️ Pedido removido");
   } catch (err) {
-    console.error("❌ Erro ao deletar:", err);
+    console.error("Erro ao salvar entregador:", err);
   }
 }
 
-function calcularMinutos(inicio, fim) {
-  if (!inicio || !fim) return null;
+// REMOVER
+async function remover(index) {
+  const p = pedidos[index];
 
-  const [h1, m1] = inicio.split(":").map(Number);
-  const [h2, m2] = fim.split(":").map(Number);
+  await fetch(API + "/pedidos/" + p._id, {
+    method: "DELETE"
+  });
 
-  return (h2 * 60 + m2) - (h1 * 60 + m1);
+  carregarPedidosDoBanco();
 }
 
-function formatarTempo(min) {
-  return min === null ? "-" : `${min} min`;
+function calcularMinutos(i, f) {
+  if (!i || !f) return null;
+  const [h1, m1] = i.split(":").map(Number);
+  const [h2, m2] = f.split(":").map(Number);
+  return h2 * 60 + m2 - (h1 * 60 + m1);
 }
 
-render();
-
-setInterval(() => {
-  setEntregador()
-}, 5000);
-
-
-setInterval(() => {
-   sincronizarComAPI();
-}, 300000); 
-
-document.getElementById("entregador").addEventListener("change", setEntregador);
+function formatarTempo(m) {
+  return m == null ? "-" : m + " min";
+}

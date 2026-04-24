@@ -14,8 +14,6 @@ router.post("/", async (req, res) => {
   const novo = new Pedido(req.body);
   await novo.save();
 
-  req.app.get("io").emit("pedidosAtualizados");
-
   res.json(novo);
 });
 
@@ -33,7 +31,6 @@ router.post("/sync", async (req, res) => {
     }
 
     // 🔥 ESSENCIAL para tempo real
-    req.app.get("io").emit("pedidosAtualizados");
 
     res.json({ ok: true });
   } catch (err) {
@@ -49,16 +46,12 @@ router.put("/:id", async (req, res) => {
     { new: true }
   );
 
-  req.app.get("io").emit("pedidosAtualizados");
-
   res.json(atualizado);
 });
 
 // DELETAR
 router.delete("/:id", async (req, res) => {
   await Pedido.findByIdAndDelete(req.params.id);
-
-  req.app.get("io").emit("pedidosAtualizados");
 
   res.json({ ok: true });
 });
