@@ -7,6 +7,7 @@ let chart;
 function atualizarPeriodicamente() {
   carregarPedidosDoBanco();
   setTimeout(atualizarPeriodicamente, 120000);
+
 }
 atualizarPeriodicamente();
 
