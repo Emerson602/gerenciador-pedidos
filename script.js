@@ -78,12 +78,15 @@ function gerarGrafico() {
     preparoArr[i] = preparo ?? null;
     caixaArr[i] = caixa ?? null;
 
+    // ✅ CADA PEDIDO CONTA (sem agrupamento)
     if (p.entregador) {
       if (!entregadores[p.entregador]) {
-        entregadores[p.entregador] = new Array(ultimos.length).fill(null);
+        entregadores[p.entregador] = [];
       }
 
-      entregadores[p.entregador][i] = entregadorTempo;
+      if (entregadorTempo !== null) {
+        entregadores[p.entregador].push(entregadorTempo);
+      }
     }
   });
 
@@ -104,12 +107,24 @@ function gerarGrafico() {
     }
   ];
 
+  // 🔥 manter posição correta no gráfico
   Object.keys(entregadores).forEach(nome => {
     const cor = coresEntregadores[nome] || "#000";
 
+    const dados = new Array(ultimos.length).fill(null);
+
+    ultimos.forEach((p, i) => {
+      if (p.entregador === nome) {
+        const tempo = calcularMinutos(p.chamei, p.saiu);
+        if (tempo !== null) {
+          dados[i] = tempo;
+        }
+      }
+    });
+
     datasets.push({
       label: `Entregador - ${nome}`,
-      data: entregadores[nome],
+      data: dados,
       backgroundColor: cor,
       borderColor: cor
     });
@@ -126,8 +141,11 @@ function gerarGrafico() {
     }
   });
 
+  // 📊 MÉDIAS + CONTAGEM
   const media = arr =>
     arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : 0;
+
+  const totalValidos = arr => arr.filter(v => v !== null).length;
 
   function corMedia(valor, limite) {
     if (valor === null || valor === undefined || isNaN(valor)) return '-';
@@ -138,12 +156,27 @@ function gerarGrafico() {
   }
 
   let html = `
-    ⏱️ Tempo médio (Cozinha): ${corMedia(media(preparoArr), 15)} min<br>
-    💬 Tempo médio (Caixa): ${corMedia(media(caixaArr), 10)} min<br>
+    ⏱️ Tempo médio (Cozinha): ${corMedia(media(preparoArr), 15)} min 
+    <span>| ${totalValidos(preparoArr)} pedidos</span><br>
+
+    💬 Tempo médio (Caixa): ${corMedia(media(caixaArr), 10)} min 
+    <span>| ${totalValidos(caixaArr)} pedidos</span><br>
   `;
 
+  // 🔥 MÉDIA POR PEDIDO (cada pedido = 1 corrida)
   Object.keys(entregadores).forEach(nome => {
-    html += `🛵 Tempo médio (${nome}): ${corMedia(media(entregadores[nome]), 10)} min<br>`;
+    const tempos = entregadores[nome];
+
+    const mediaFinal = tempos.length
+      ? (tempos.reduce((a, b) => a + b, 0) / tempos.length).toFixed(1)
+      : 0;
+
+    const totalCorridas = tempos.length;
+
+    const totalPedidos = ultimos.filter(p => p.entregador === nome).length;
+
+    html += `🛵 Tempo médio (${nome}): ${corMedia(mediaFinal, 10)} min 
+    <span>| ${totalCorridas} corridas</span><br>`;
   });
 
   document.getElementById("medias").innerHTML = html;
