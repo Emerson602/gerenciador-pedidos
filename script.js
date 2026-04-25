@@ -438,14 +438,36 @@ async function remover(index) {
 async function confirmarExclusao() {
   if (!pedidoParaExcluir) return;
 
-  await fetch(API + "/pedidos/" + pedidoParaExcluir._id, {
-    method: "DELETE"
-  });
+  const senha = document.getElementById("senhaExcluir").value;
+  const erro = document.getElementById("erroSenha");
 
+  if (senha !== "1597538426") {
+    erro.classList.remove("hidden");
+    return;
+  }
+
+  try {
+    await fetch(API + "/pedidos/" + pedidoParaExcluir._id, {
+      method: "DELETE"
+    });
+
+    pedidoParaExcluir = null;
+
+    fecharModalExcluir();
+    carregarPedidosDoBanco();
+
+  } catch (err) {
+    console.error("Erro ao excluir:", err);
+  }
+}
+
+function fecharModalExcluir() {
   pedidoParaExcluir = null;
 
-  fecharModalExcluir();
-  carregarPedidosDoBanco();
+  document.getElementById("senhaExcluir").value = "";
+  document.getElementById("erroSenha").classList.add("hidden");
+
+  document.getElementById("modalExcluir").classList.add("hidden");
 }
 
 function fecharModalExcluir() {
