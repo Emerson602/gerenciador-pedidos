@@ -190,7 +190,7 @@ function render() {
   const lista = document.getElementById("lista");
   lista.innerHTML = "";
 
-  [...pedidos].reverse().forEach((p, indexOriginal) => {
+  [...pedidos].forEach((p, indexOriginal) => {
     const index = pedidos.length - 1 - indexOriginal;
 
       const tempoPreparo = calcularMinutos(p.recebido, p.pronto);
@@ -208,8 +208,8 @@ function render() {
         <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
 
           <div class="relative group m-2">
-            <div class="text-base ${tempoPreparo >= 15 ? 'text-red-500 font-bold' : ''}">
-              ⏱️ Preparo (cozinha): ${tempoPreparo !== null ? tempoPreparo + ' min' : '-'}
+            <div class="text-base">
+              ⏱️ Preparo (cozinha): <strong class="${tempoPreparo >= 15 ? 'text-red-500 font-bold' : 'text-green-500 font-bold'}">${tempoPreparo !== null ? tempoPreparo + ' min' : '-'}</strong>
             </div>
 
             <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 
@@ -220,8 +220,8 @@ function render() {
           </div>
 
           <div class="relative group m-2">
-            <div class="text-base ${tempoCaixa >= 10 ? 'text-red-500 font-bold' : ''}">
-              💬 Organização (caixa): ${tempoCaixa !== null ? tempoCaixa + ' min' : '-'}
+            <div class="text-base">
+              💬 Organização (caixa):<strong class="${tempoCaixa >= 10 ? 'text-red-500 font-bold' : 'text-green-500'}"> ${tempoCaixa !== null ? tempoCaixa + ' min' : '-'} </strong>
             </div>
 
             <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 
@@ -232,8 +232,8 @@ function render() {
           </div>
 
           <div class="relative group m-2">
-            <div class="text-base ${tempoEntrega >= 10 ? 'text-red-500 font-bold' : ''}">
-              🛵 Saida (motoboy): ${tempoEntrega !== null ? tempoEntrega + ' min' : '-'}
+            <div class="text-base">
+              🛵 Saida (motoboy): <strong class="${tempoEntrega >= 10 ? 'text-red-500 font-bold' : 'text-green-500'}">${tempoEntrega !== null ? tempoEntrega + ' min' : '-'}</strong>
             </div>
 
             <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 
