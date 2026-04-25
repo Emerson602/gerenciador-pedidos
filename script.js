@@ -57,23 +57,35 @@ function gerarGrafico() {
   const caixaArr = [];
   const entregadores = {};
 
-  ultimos.forEach(p => {
+  const labels = ultimos.map(p => p.pedido);
+
+  // 🎨 cores fixas
+  const coresEntregadores = {
+    Miqueias: "#c52222",
+    Ivan: "#0614d4",
+    Bruno: "#18963e",
+    Lucas: "#7b33be",
+    Gustavo: "#e9ef48",
+    Extra: "#2d6872",
+    Ifood: "#a3d0c3"
+  };
+
+  ultimos.forEach((p, i) => {
     const preparo = calcularMinutos(p.recebido, p.pronto);
     const entregadorTempo = calcularMinutos(p.chamei, p.saiu);
     const caixa = calcularMinutos(p.pronto, p.chamei);
 
-    if (preparo !== null) preparoArr.push(preparo);
-    if (caixa !== null) caixaArr.push(caixa);
+    preparoArr[i] = preparo ?? null;
+    caixaArr[i] = caixa ?? null;
 
-    if (entregadorTempo !== null && p.entregador) {
+    if (p.entregador) {
       if (!entregadores[p.entregador]) {
-        entregadores[p.entregador] = [];
+        entregadores[p.entregador] = new Array(ultimos.length).fill(null);
       }
-      entregadores[p.entregador].push(entregadorTempo);
+
+      entregadores[p.entregador][i] = entregadorTempo;
     }
   });
-
-  const labels = ultimos.map(p => p.pedido);
 
   if (chart) chart.destroy();
 
@@ -81,53 +93,58 @@ function gerarGrafico() {
 
   const datasets = [
     {
-      label: "Preparo",
+      label: "Cozinha",
       data: preparoArr,
-      backgroundColor: "#B0C4DE"
+      backgroundColor: "#d32a8f"
     },
     {
       label: "Caixa",
       data: caixaArr,
-      backgroundColor: "#556B2F"
+      backgroundColor: "#252425"
     }
   ];
 
   Object.keys(entregadores).forEach(nome => {
-    const cor = `hsl(${Math.random() * 360}, 70%, 50%)`;
+    const cor = coresEntregadores[nome] || "#000";
 
     datasets.push({
       label: `Entregador - ${nome}`,
       data: entregadores[nome],
-      borderColor: cor,
-      backgroundColor: cor
+      backgroundColor: cor,
+      borderColor: cor
     });
   });
 
   chart = new Chart(ctx, {
     type: "bar",
     data: { labels, datasets },
-    options: { responsive: true }
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
   });
 
   const media = arr =>
     arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : 0;
 
-function corMedia(valor, limite) {
-  if (valor === null || valor === undefined || isNaN(valor)) return '-';
+  function corMedia(valor, limite) {
+    if (valor === null || valor === undefined || isNaN(valor)) return '-';
 
-  return valor >= limite
-    ? `<span class="text-red-500 font-bold">${valor}</span>`
-    : valor;
-}
+    return valor >= limite
+      ? `<span class="text-red-500 font-bold">${valor}</span>`
+      : valor;
+  }
 
-let html = `
-  ⏱️ Tempo médio (Cozinha): ${corMedia(media(preparoArr), 15)} min<br>
-  💬 Tempo médio (Caixa): ${corMedia(media(caixaArr), 10)} min<br>
-`;
+  let html = `
+    ⏱️ Tempo médio (Cozinha): ${corMedia(media(preparoArr), 15)} min<br>
+    💬 Tempo médio (Caixa): ${corMedia(media(caixaArr), 10)} min<br>
+  `;
 
-Object.keys(entregadores).forEach(nome => {
-  html += `🛵 Tempo médio (${nome}): ${corMedia(media(entregadores[nome]), 10)} min<br>`;
-});
+  Object.keys(entregadores).forEach(nome => {
+    html += `🛵 Tempo médio (${nome}): ${corMedia(media(entregadores[nome]), 10)} min<br>`;
+  });
 
   document.getElementById("medias").innerHTML = html;
 }
@@ -284,6 +301,7 @@ function render() {
           <option ${p.entregador === 'Lucas' ? 'selected' : ''}>Lucas</option>
           <option ${p.entregador === 'Gustavo' ? 'selected' : ''}>Gustavo</option>
           <option ${p.entregador === 'Extra' ? 'selected' : ''}>Extra</option>
+          <option ${p.entregador === 'Ifood' ? 'selected' : ''}>Ifood</option>
         </select>
 
           
