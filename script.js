@@ -1,6 +1,7 @@
 const API = "https://api-pedidos-dlw2.onrender.com";
 
 let pedidos = [];
+let pedidoParaExcluir = null;
 let chart;
 
 // 🔄 atualização automática (2 min)
@@ -241,7 +242,7 @@ function render() {
   lista.innerHTML = "";
 
   [...pedidos].forEach((p, indexOriginal) => {
-    const index = pedidos.length - 1 - indexOriginal;
+    const index = indexOriginal;
 
       const tempoPreparo = calcularMinutos(p.recebido, p.pronto);
       const tempoCaixa = calcularMinutos(p.pronto, p.chamei);
@@ -426,12 +427,30 @@ async function setEntregador(index, entregador) {
 // REMOVER
 async function remover(index) {
   const p = pedidos[index];
+  if (!p) return;
 
-  await fetch(API + "/pedidos/" + p._id, {
+  pedidoParaExcluir = p;
+
+  document.getElementById("pedidoExcluirNumero").innerText = p.pedido;
+  document.getElementById("modalExcluir").classList.remove("hidden");
+}
+
+async function confirmarExclusao() {
+  if (!pedidoParaExcluir) return;
+
+  await fetch(API + "/pedidos/" + pedidoParaExcluir._id, {
     method: "DELETE"
   });
 
+  pedidoParaExcluir = null;
+
+  fecharModalExcluir();
   carregarPedidosDoBanco();
+}
+
+function fecharModalExcluir() {
+  pedidoParaExcluir = null;
+  document.getElementById("modalExcluir").classList.add("hidden");
 }
 
 function calcularMinutos(i, f) {
