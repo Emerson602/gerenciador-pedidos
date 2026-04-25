@@ -176,7 +176,7 @@ function gerarGrafico() {
     const totalPedidos = ultimos.filter(p => p.entregador === nome).length;
 
     html += `🛵 Tempo médio (${nome}): ${corMedia(mediaFinal, 10)} min 
-    <span>| ${totalCorridas} corridas</span><br>`;
+    <span>| ${totalCorridas} pedidos</span><br>`;
   });
 
   document.getElementById("medias").innerHTML = html;
