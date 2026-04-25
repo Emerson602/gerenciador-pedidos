@@ -123,7 +123,7 @@ function gerarGrafico() {
     });
 
     datasets.push({
-      label: `Entregador - ${nome}`,
+      label: `${nome}`,
       data: dados,
       backgroundColor: cor,
       borderColor: cor
@@ -151,8 +151,8 @@ function gerarGrafico() {
     if (valor === null || valor === undefined || isNaN(valor)) return '-';
 
     return valor >= limite
-      ? `<span class="text-red-500 font-bold">${valor}</span>`
-      : valor;
+      ? `<span class="text-red-800 font-bold">${valor}</span>`
+      : `<span class="text-green-800 font-bold">${valor}</span>`;
   }
 
   let html = `
