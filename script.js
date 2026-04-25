@@ -3,6 +3,7 @@ const API = "https://api-pedidos-dlw2.onrender.com";
 let pedidos = [];
 let pedidoParaExcluir = null;
 let chart;
+let editarTemp = null;
 
 // 🔄 atualização automática (2 min)
 function atualizarPeriodicamente() {
@@ -198,13 +199,35 @@ function togglePainel() {
     : "⚙️ Esconder Painel";
 }
 
-async function editarCampo(index, campo) {
+function editarCampo(index, campo) {
+  editarTemp = { index, campo };
+
+  document.getElementById("senhaEditar").value = "";
+  document.getElementById("erroSenhaEditar").classList.add("hidden");
+
+  document.getElementById("modalSenhaEditar").classList.remove("hidden");
+}
+
+async function confirmarEdicao() {
+  if (!editarTemp) return;
+
+  const senha = document.getElementById("senhaEditar").value;
+  const erro = document.getElementById("erroSenhaEditar");
+
+  if (senha !== "kjkszpj") {
+    erro.classList.remove("hidden");
+    return;
+  }
+
+  const { index, campo } = editarTemp;
   const p = pedidos[index];
-  if (!p) return;
 
   const novo = prompt(`Editar ${campo}:`, p[campo] || "");
 
-  if (novo === null) return;
+  if (novo === null) {
+    fecharModalEditar();
+    return;
+  }
 
   try {
     const res = await fetch(API + "/pedidos/" + p._id, {
@@ -227,6 +250,14 @@ async function editarCampo(index, campo) {
   } catch (err) {
     console.error("Erro ao editar:", err);
   }
+
+  fecharModalEditar();
+}
+
+function fecharModalEditar() {
+  editarTemp = null;
+
+  document.getElementById("modalSenhaEditar").classList.add("hidden");
 }
 
 window.onload = () => {
@@ -441,7 +472,7 @@ async function confirmarExclusao() {
   const senha = document.getElementById("senhaExcluir").value;
   const erro = document.getElementById("erroSenha");
 
-  if (senha !== "1597538426") {
+  if (senha !== "kjkszpj") {
     erro.classList.remove("hidden");
     return;
   }

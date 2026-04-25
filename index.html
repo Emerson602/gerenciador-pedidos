@@ -77,6 +77,35 @@
     </div>
   </div>
 
+  <div id="modalSenhaEditar" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-sm text-center">
+
+    <h2 class="text-lg font-bold mb-4">Senha para editar</h2>
+
+    <input 
+      id="senhaEditar"
+      type="password"
+      placeholder="Digite a senha"
+      class="border p-2 rounded w-full mb-4 text-center"
+    />
+
+    <p id="erroSenhaEditar" class="text-red-600 text-sm mb-2 hidden">
+      ❌ Senha incorreta
+    </p>
+
+    <div class="flex gap-2 justify-center">
+      <button onclick="confirmarEdicao()" class="bg-green-600 text-white px-4 py-2 rounded">
+        Confirmar
+      </button>
+
+      <button onclick="fecharModalEditar()" class="bg-gray-400 text-white px-4 py-2 rounded">
+        Cancelar
+      </button>
+    </div>
+
+  </div>
+</div>
+
 <div id="modalExcluir" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
   <div class="bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-sm text-center">
     
