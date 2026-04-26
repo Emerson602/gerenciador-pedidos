@@ -138,6 +138,33 @@
   </div>
 </div>
 
+<div id="modalSenhaEntregador" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-sm text-center">
+    
+    <h2 class="text-lg font-bold mb-4">Senha para alterar entregador</h2>
+
+    <input id="senhaEditarEntregador" type="password"
+      class="border p-2 rounded w-full mb-3"
+      placeholder="Digite a senha">
+
+    <p id="erroSenhaEntregador" class="text-red-500 hidden mb-2">
+      Senha incorreta
+    </p>
+
+    <div class="flex gap-2 justify-center">
+      <button onclick="confirmarSenhaEntregador()"
+        class="bg-green-600 text-white px-4 py-2 rounded">
+        Confirmar
+      </button>
+
+      <button onclick="fecharModalSenhaEntregador()"
+        class="bg-gray-400 text-white px-4 py-2 rounded">
+        Cancelar
+      </button>
+    </div>
+
+  </div>
+</div>
   
 
   <!-- Chart -->

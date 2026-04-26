@@ -1,7 +1,8 @@
 const API = "https://api-pedidos-dlw2.onrender.com";
 
 let pedidos = [];
-let pedidoParaExcluir = null;
+let pedidoParaExcluir = null;7
+let editarEntregadorTemp = null;
 let chart;
 let editarTemp = null;
 
@@ -353,12 +354,12 @@ function render() {
         </div>
 
         <div class="flex flex-row flex-wrap gap-2 mt-2">
-        <button onclick="acao(${index}, 'recebido')" class="rounded-lg bg-yellow-500 text-white p-2">Pedido recebido</button>
-        <button onclick="acao(${index}, 'pronto')" class="rounded-lg bg-green-500 text-white p-2">Pedido ficou pronto</button>
-        <button onclick="acao(${index}, 'chamei')" class="rounded-lg bg-orange-500 text-white p-2">Chamei entregador</button>
-        <button onclick="acao(${index}, 'saiu')" class="rounded-lg bg-red-500 text-white p-2">Saiu para entrega</button>
+        <button onclick="acao(${index}, 'recebido', this)" class="rounded-lg bg-yellow-500 text-white p-2">Pedido recebido</button>
+        <button onclick="acao(${index}, 'pronto', this)" class="rounded-lg bg-green-500 text-white p-2">Pedido ficou pronto</button>
+        <button onclick="acao(${index}, 'chamei', this)" class="rounded-lg bg-orange-500 text-white p-2">Chamei entregador</button>
+        <button onclick="acao(${index}, 'saiu', this)" class="rounded-lg bg-red-500 text-white p-2">Saiu para entrega</button>
 
-        <select class="border-2 border-black rounded-lg p-2" onchange="setEntregador(${index}, this.value)">
+        <select class="border-2 border-black rounded-lg p-2" onchange="setEntregador(${index}, this.value, this)">
           <option value=""></option>
           <option ${p.entregador === 'Miqueias' ? 'selected' : ''}>Miqueias</option>
           <option ${p.entregador === 'Ivan' ? 'selected' : ''}>Ivan</option>
@@ -399,11 +400,20 @@ async function criarPedido() {
 }
 
 // AÇÃO
-async function acao(index, tipo) {
+async function acao(index, tipo, btn) {
   const p = pedidos[index];
   if (!p) return;
 
+  // 🚫 se já tem valor, não deixa clicar
+  if (p[tipo]) {
+    btn.disabled = true;
+    return;
+  }
+
   const hora = horaAgora();
+
+  // 🔒 desabilita imediatamente
+  btn.disabled = true;
 
   try {
     const res = await fetch(API + "/pedidos/" + p._id, {
@@ -418,17 +428,38 @@ async function acao(index, tipo) {
     });
 
     const atualizado = await res.json();
-
     pedidos[index] = atualizado;
 
     render();
 
   } catch (err) {
     console.error("Erro na ação:", err);
+
+    // ❗ se der erro, reativa
+    btn.disabled = false;
   }
 }
 // ENTREGADOR
-async function setEntregador(index, entregador) {
+async function setEntregador(index, entregador, select) {
+  const p = pedidos[index];
+  if (!p) return;
+
+  // 🟡 PRIMEIRA VEZ → salva normal
+  if (!p.entregador) {
+    await salvarEntregador(index, entregador);
+    return;
+  }
+
+  // 🔒 JÁ TEM ENTREGADOR → pedir senha
+  editarEntregadorTemp = { index, entregador, select };
+
+  document.getElementById("senhaEditarEntregador").value = "";
+  document.getElementById("erroSenhaEntregador").classList.add("hidden");
+
+  document.getElementById("modalSenhaEntregador").classList.remove("hidden");
+}
+
+async function salvarEntregador(index, entregador) {
   const p = pedidos[index];
   if (!p) return;
 
@@ -445,7 +476,6 @@ async function setEntregador(index, entregador) {
     });
 
     const atualizado = await res.json();
-
     pedidos[index] = atualizado;
 
     render();
@@ -453,6 +483,29 @@ async function setEntregador(index, entregador) {
   } catch (err) {
     console.error("Erro ao salvar entregador:", err);
   }
+}
+
+async function confirmarSenhaEntregador() {
+  if (!editarEntregadorTemp) return;
+
+  const senha = document.getElementById("senhaEditarEntregador").value;
+  const erro = document.getElementById("erroSenhaEntregador");
+
+  if (senha !== "kjkszpj") {
+    erro.classList.remove("hidden");
+    return;
+  }
+
+  const { index, entregador } = editarEntregadorTemp;
+
+  await salvarEntregador(index, entregador);
+
+  fecharModalSenhaEntregador();
+}
+
+function fecharModalSenhaEntregador() {
+  editarEntregadorTemp = null;
+  document.getElementById("modalSenhaEntregador").classList.add("hidden");
 }
 
 // REMOVER
@@ -500,6 +553,7 @@ function fecharModalExcluir() {
 
   document.getElementById("modalExcluir").classList.add("hidden");
 }
+
 
 function fecharModalExcluir() {
   pedidoParaExcluir = null;
