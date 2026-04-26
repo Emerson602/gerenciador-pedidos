@@ -1,10 +1,11 @@
 const API = "https://api-pedidos-dlw2.onrender.com";
 
 let pedidos = [];
-let pedidoParaExcluir = null;7
+let pedidoParaExcluir = null;
 let editarEntregadorTemp = null;
 let chart;
 let editarTemp = null;
+let limiteExibicao = 50;
 
 // 🔄 atualização automática (2 min)
 function atualizarPeriodicamente() {
@@ -19,6 +20,9 @@ async function carregarPedidosDoBanco() {
   try {
     const res = await axios.get(API + "/pedidos");
     pedidos = res.data;
+
+    limiteExibicao = 50; // 👈 reset
+
     render();
   } catch (err) {
     console.error("❌ Erro ao carregar pedidos:", err);
@@ -41,6 +45,45 @@ function horaAgora() {
     minute: '2-digit'
   });
 }
+
+function converterDataBR(dataStr) {
+  if (!dataStr) return null;
+
+  const [dia, mes] = dataStr.split("/").map(Number);
+  const anoAtual = new Date().getFullYear();
+
+  return new Date(anoAtual, mes - 1, dia);
+}
+
+async function limparPedidosAntigos() {
+  const hoje = new Date();
+
+  for (const p of pedidos) {
+    const dataPedido = converterDataBR(p.data);
+
+    if (!dataPedido) continue;
+
+    const diffDias = (hoje - dataPedido) / (1000 * 60 * 60 * 24);
+
+    if (diffDias >= 30) {
+      try {
+        await fetch(API + "/pedidos/" + p._id, {
+          method: "DELETE"
+        });
+
+        console.log("🗑️ Pedido removido:", p.pedido);
+
+      } catch (err) {
+        console.error("Erro ao excluir pedido antigo:", err);
+      }
+    }
+  }
+
+  // 🔄 atualiza lista depois
+  carregarPedidosDoBanco();
+}
+
+limparPedidosAntigos();
 
 // MODAL
 function abrirModal() {
@@ -272,8 +315,9 @@ window.onload = () => {
 function render() {
   const lista = document.getElementById("lista");
   lista.innerHTML = "";
+  const listaLimitada = [...pedidos].slice(0, limiteExibicao);
 
-  [...pedidos].forEach((p, indexOriginal) => {
+  listaLimitada.forEach((p, indexOriginal) => {
     const index = indexOriginal;
 
       const tempoPreparo = calcularMinutos(p.recebido, p.pronto);
@@ -376,8 +420,28 @@ function render() {
         <button onclick="remover(${index})" class="rounded-lg bg-red-600 text-white mt-2 p-2">Excluir</button>
 
       </div>
+      
     `;
   });
+}
+
+
+function verMais() {
+  limiteExibicao += 50;
+  render();
+}
+
+async function carregarPedidosDoBanco() {
+  try {
+    const res = await axios.get(API + "/pedidos");
+    pedidos = res.data;
+
+    limiteExibicao = 50; // 👈 reset
+
+    render();
+  } catch (err) {
+    console.error("❌ Erro ao carregar pedidos:", err);
+  }
 }
 
 // CRIAR
