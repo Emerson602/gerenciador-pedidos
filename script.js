@@ -10,10 +10,20 @@ let limiteExibicao = 50;
 // 🔄 atualização automática (2 min)
 function atualizarPeriodicamente() {
   carregarPedidosDoBanco();
-  setTimeout(atualizarPeriodicamente, 120000); 
 }
 
 atualizarPeriodicamente();
+
+function diaMesAtualCompacto() {
+  const hoje = new Date();
+  const dia = String(hoje.getDate()).padStart(2, '0');
+  const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+
+  return `${dia}${mes}`;
+}
+
+let password = diaMesAtualCompacto();
+
 
 // 📥 carregar pedidos
 async function carregarPedidosDoBanco() {
@@ -94,6 +104,16 @@ function abrirModal() {
 function fecharModal() {
   document.getElementById("modal").classList.add("hidden");
 }
+
+  function minValido(arr) {
+    const validos = arr.filter(v => v !== null && !isNaN(v));
+    return validos.length ? Math.min(...validos) : null;
+  }
+
+  function maxValido(arr) {
+    const validos = arr.filter(v => v !== null && !isNaN(v));
+    return validos.length ? Math.max(...validos) : null;
+  }
 
 // GRÁFICO
 function gerarGrafico() {
@@ -202,28 +222,29 @@ function gerarGrafico() {
   }
 
   let html = `
-    ⏱️ Tempo médio (Cozinha): ${corMedia(media(preparoArr), 15)} min 
+    ⏱️ Tempo médio (Cozinha): ${corMedia(media(preparoArr), 15)} min  
+    <span>| Maior tempo: ${corMedia(maxValido(preparoArr), 15) ?? '-'} min</span>
     <span>| ${totalValidos(preparoArr)} pedidos</span><br>
 
-    💬 Tempo médio (Caixa): ${corMedia(media(caixaArr), 10)} min 
+    💬 Tempo médio (Caixa): ${corMedia(media(caixaArr), 10)} min     
+    <span>| Maior tempo: ${corMedia(maxValido(caixaArr), 10) ?? '-'} min</span>
     <span>| ${totalValidos(caixaArr)} pedidos</span><br>
   `;
 
   // 🔥 MÉDIA POR PEDIDO (cada pedido = 1 corrida)
-  Object.keys(entregadores).forEach(nome => {
-    const tempos = entregadores[nome];
+Object.keys(entregadores).forEach(nome => {
+  const tempos = entregadores[nome];
 
-    const mediaFinal = tempos.length
-      ? (tempos.reduce((a, b) => a + b, 0) / tempos.length).toFixed(1)
-      : 0;
+  const mediaFinal = tempos.length
+    ? (tempos.reduce((a, b) => a + b, 0) / tempos.length).toFixed(1)
+    : 0;
 
-    const totalCorridas = tempos.length;
+  const totalCorridas = tempos.length;
 
-    const totalPedidos = ultimos.filter(p => p.entregador === nome).length;
-
-    html += `🛵 Tempo médio (${nome}): ${corMedia(mediaFinal, 10)} min 
-    <span>| ${totalCorridas} pedidos</span><br>`;
-  });
+  html += `🛵 Tempo médio (${nome}): ${corMedia(mediaFinal, 10)} min  
+  <span>| Maior tempo: ${corMedia(maxValido(tempos), 10) ?? '-'} min</span>
+  <span>| ${totalCorridas} pedidos</span><br>`;
+});
 
   document.getElementById("medias").innerHTML = html;
 }
@@ -258,7 +279,7 @@ async function confirmarEdicao() {
   const senha = document.getElementById("senhaEditar").value;
   const erro = document.getElementById("erroSenhaEditar");
 
-  if (senha !== "kjkszpj") {
+  if (senha !== password) {
     erro.classList.remove("hidden");
     return;
   }
@@ -555,7 +576,7 @@ async function confirmarSenhaEntregador() {
   const senha = document.getElementById("senhaEditarEntregador").value;
   const erro = document.getElementById("erroSenhaEntregador");
 
-  if (senha !== "kjkszpj") {
+  if (senha !== password) {
     erro.classList.remove("hidden");
     return;
   }
@@ -589,7 +610,7 @@ async function confirmarExclusao() {
   const senha = document.getElementById("senhaExcluir").value;
   const erro = document.getElementById("erroSenha");
 
-  if (senha !== "kjkszpj") {
+  if (senha !== password) {
     erro.classList.remove("hidden");
     return;
   }
@@ -634,3 +655,19 @@ function calcularMinutos(i, f) {
 function formatarTempo(m) {
   return m == null ? "-" : m + " min";
 }
+
+function scrollParaLogo() {
+  const elemento = document.querySelector('.container-logo');
+  
+  if (elemento) {
+    elemento.scrollIntoView({
+      behavior: 'smooth', // rolagem suave
+      block: 'start' // posiciona no topo
+    });
+  }
+}
+
+
+setInterval(() => {
+  scrollParaLogo()
+}, 600000)
