@@ -85,8 +85,8 @@
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: #000;
-  color: #fff;
+  background: transparent;
+  color: #141414;
   border: none;
   padding: 12px 20px;
   border-radius: 50%;
@@ -97,6 +97,7 @@
 
 .btn-topo:hover {
   background: #333;
+  color: #fff;
 }
 
 @media (max-width: 768px) {
