@@ -209,7 +209,7 @@ function gerarGrafico() {
 
   // 📊 MÉDIAS + CONTAGEM
   const media = arr =>
-    arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : 0;
+    arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(0) : 0;
 
   const totalValidos = arr => arr.filter(v => v !== null).length;
 
@@ -217,18 +217,18 @@ function gerarGrafico() {
     if (valor === null || valor === undefined || isNaN(valor)) return '-';
 
     return valor >= limite
-      ? `<span class="text-red-800 font-bold">${valor}</span>`
+      ? `<span class="text-red-600 font-bold">${valor}</span>`
       : `<span class="text-green-800 font-bold">${valor}</span>`;
   }
 
   let html = `
     ⏱️ Tempo médio (Cozinha): ${corMedia(media(preparoArr), 15)} min  
     <span>| Maior tempo: ${corMedia(maxValido(preparoArr), 15) ?? '-'} min</span>
-    <span>| ${totalValidos(preparoArr)} pedidos</span><br>
+    <span>| ${totalValidos(preparoArr)} pedidos</span><br><br>
 
-    💬 Tempo médio (Caixa): ${corMedia(media(caixaArr), 10)} min     
+    💻 Tempo médio (Caixa): ${corMedia(media(caixaArr), 10)} min     
     <span>| Maior tempo: ${corMedia(maxValido(caixaArr), 10) ?? '-'} min</span>
-    <span>| ${totalValidos(caixaArr)} pedidos</span><br>
+    <span>| ${totalValidos(caixaArr)} pedidos</span><br><br>
   `;
 
   // 🔥 MÉDIA POR PEDIDO (cada pedido = 1 corrida)
@@ -236,14 +236,14 @@ Object.keys(entregadores).forEach(nome => {
   const tempos = entregadores[nome];
 
   const mediaFinal = tempos.length
-    ? (tempos.reduce((a, b) => a + b, 0) / tempos.length).toFixed(1)
+    ? (tempos.reduce((a, b) => a + b, 0) / tempos.length).toFixed(0)
     : 0;
 
   const totalCorridas = tempos.length;
 
   html += `🛵 Tempo médio (${nome}): ${corMedia(mediaFinal, 10)} min  
   <span>| Maior tempo: ${corMedia(maxValido(tempos), 10) ?? '-'} min</span>
-  <span>| ${totalCorridas} pedidos</span><br>`;
+  <span>| ${totalCorridas} pedidos</span><br><br>`;
 });
 
   document.getElementById("medias").innerHTML = html;
@@ -260,8 +260,8 @@ function togglePainel() {
   localStorage.setItem("painelHidden", escondido);
 
   btn.innerText = escondido
-    ? "⚙️ Mostrar Painel"
-    : "⚙️ Esconder Painel";
+    ? "⚙️ Exibir Painel"
+    : "⚙️ Ocultar Painel";
 }
 
 function editarCampo(index, campo) {
@@ -357,7 +357,7 @@ function render() {
 
           <div class="relative group m-2">
             <div class="text-base">
-              ⏱️ Preparo (cozinha): <strong class="${tempoPreparo >= 15 ? 'text-red-500 font-bold' : 'text-green-500 font-bold'}">${tempoPreparo !== null ? tempoPreparo + ' min' : '-'}</strong>
+              ⏱️ Preparo (cozinha): <strong class="${tempoPreparo >= 15 ? 'text-red-600 font-bold' : 'text-green-700 font-bold'}">${tempoPreparo !== null ? tempoPreparo + ' min' : '-'}</strong>
             </div>
 
             <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 
@@ -369,7 +369,7 @@ function render() {
 
           <div class="relative group m-2">
             <div class="text-base">
-              💬 Organização (caixa):<strong class="${tempoCaixa >= 10 ? 'text-red-500 font-bold' : 'text-green-500'}"> ${tempoCaixa !== null ? tempoCaixa + ' min' : '-'} </strong>
+              💻 Organização (caixa):<strong class="${tempoCaixa >= 10 ? 'text-red-600 font-bold' : 'text-green-700'}"> ${tempoCaixa !== null ? tempoCaixa + ' min' : '-'} </strong>
             </div>
 
             <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 
@@ -381,7 +381,7 @@ function render() {
 
           <div class="relative group m-2">
             <div class="text-base">
-              🛵 Saida (motoboy): <strong class="${tempoEntrega >= 10 ? 'text-red-500 font-bold' : 'text-green-500'}">${tempoEntrega !== null ? tempoEntrega + ' min' : '-'}</strong>
+              🛵 Saida (motoboy): <strong class="${tempoEntrega >= 10 ? 'text-red-600 font-bold' : 'text-green-700'}">${tempoEntrega !== null ? tempoEntrega + ' min' : '-'}</strong>
             </div>
 
             <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 
@@ -395,19 +395,19 @@ function render() {
 
       <div class="flex flex-row flex-wrap">
         <div onclick="editarCampo(${index}, 'recebido')" class="m-2 cursor-pointer">
-          <strong>Pedido recebido:</strong> ${p.recebido || '-'}
+          <strong>Pedido recebido:</strong> <strong class="text-green-700">${p.recebido || '-'}</strong>
         </div>
 
         <div onclick="editarCampo(${index}, 'pronto')" class="m-2 cursor-pointer">
-          <strong>Pedido pronto:</strong> ${p.pronto || '-'}
+          <strong>Pedido pronto:</strong> <strong class="text-green-700">${p.pronto || '-'}</strong>
         </div>
 
         <div onclick="editarCampo(${index}, 'chamei')" class="m-2 cursor-pointer">
-          <strong>Chamei motoboy:</strong> ${p.chamei || '-'}
+          <strong>Chamei motoboy:</strong> <strong class="text-green-700">${p.chamei || '-'}</strong>
         </div>
 
         <div onclick="editarCampo(${index}, 'saiu')" class="m-2 cursor-pointer">
-          <strong>Saiu para entrega:</strong> ${p.saiu || '-'}
+          <strong>Saiu para entrega:</strong> <strong class="text-green-700">${p.saiu || '-'}</strong>
         </div>
       </div>
         <div class="m-2">
@@ -419,10 +419,10 @@ function render() {
         </div>
 
         <div class="flex flex-row flex-wrap gap-2 mt-2">
-        <button onclick="acao(${index}, 'recebido', this)" class="rounded-lg bg-yellow-500 text-white p-2">Pedido recebido</button>
-        <button onclick="acao(${index}, 'pronto', this)" class="rounded-lg bg-green-500 text-white p-2">Pedido ficou pronto</button>
-        <button onclick="acao(${index}, 'chamei', this)" class="rounded-lg bg-orange-500 text-white p-2">Chamei entregador</button>
-        <button onclick="acao(${index}, 'saiu', this)" class="rounded-lg bg-red-500 text-white p-2">Saiu para entrega</button>
+        <button onclick="acao(${index}, 'recebido', this)" class="rounded-lg bg-green-700 text-white p-2">Pedido recebido</button>
+        <button onclick="acao(${index}, 'pronto', this)" class="rounded-lg bg-green-700 text-white p-2">Pedido ficou pronto</button>
+        <button onclick="acao(${index}, 'chamei', this)" class="rounded-lg bg-green-700 text-white p-2">Chamei entregador</button>
+        <button onclick="acao(${index}, 'saiu', this)" class="rounded-lg bg-green-700 text-white p-2">Saiu para entrega</button>
 
         <select class="border-2 border-black rounded-lg p-2" onchange="setEntregador(${index}, this.value, this)">
           <option value=""></option>

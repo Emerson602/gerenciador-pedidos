@@ -31,7 +31,7 @@
 
     <button id="btnPainel" onclick="togglePainel()" 
       class="bg-gray-700 text-white px-4 h-12 rounded flex items-center justify-center w-[90%] sm:w-auto">
-      ⚙️ Esconder Painel
+      ⚙️ Ocultar Painel
     </button>
   </div>
 
@@ -52,7 +52,7 @@
       class="border rounded" /> 
 
     <button onclick="criarPedido()" 
-      class="bg-blue-500 text-white rounded">
+      class="bg-green-700 text-white rounded">
       Criar
     </button>
 
@@ -68,7 +68,7 @@
     <div class="modal-content">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-bold">📊 Estatisticas - últimos 30 dias</h2>
-        <button onclick="fecharModal()" class="text-red-500">✖</button>
+        <button onclick="fecharModal()" class="text-red-600">✖</button>
       </div>
 
       <canvas id="grafico"></canvas>
@@ -79,7 +79,7 @@
   <div id="modalSenhaEditar" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
   <div class="bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-sm text-center">
 
-    <h2 class="text-lg font-bold mb-4">Senha para editar</h2>
+    <h2 class="text-lg font-bold mb-4">Digite a senha</h2>
 
     <input 
       id="senhaEditar"
@@ -93,7 +93,7 @@
     </p>
 
     <div class="flex gap-2 justify-center">
-      <button onclick="confirmarEdicao()" class="bg-green-600 text-white px-4 py-2 rounded">
+      <button onclick="confirmarEdicao()" class="bg-green-700 text-white px-4 py-2 rounded">
         Confirmar
       </button>
 
@@ -140,19 +140,19 @@
 <div id="modalSenhaEntregador" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
   <div class="bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-sm text-center">
     
-    <h2 class="text-lg font-bold mb-4">Senha para alterar entregador</h2>
+    <h2 class="text-lg font-bold mb-4">Digite a senha</h2>
 
     <input id="senhaEditarEntregador" type="password"
       class="border p-2 rounded w-full mb-3"
       placeholder="Digite a senha">
 
-    <p id="erroSenhaEntregador" class="text-red-500 hidden mb-2">
+    <p id="erroSenhaEntregador" class="text-red-600 hidden mb-2">
       Senha incorreta
     </p>
 
     <div class="flex gap-2 justify-center">
       <button onclick="confirmarSenhaEntregador()"
-        class="bg-green-600 text-white px-4 py-2 rounded">
+        class="bg-green-700 text-white px-4 py-2 rounded">
         Confirmar
       </button>
 
@@ -167,7 +167,7 @@
  
 <div class="text-center mt-4">
   <button onclick="verMais()" 
-    class="bg-blue-600 text-white px-4 py-2 rounded">
+    class="bg-green-700 text-white px-4 py-2 rounded">
     Ver mais
   </button>
 </div>
