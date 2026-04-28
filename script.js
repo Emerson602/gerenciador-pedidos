@@ -222,7 +222,7 @@ function gerarGrafico() {
   }
 
   let html = `
-    ⏱️ Tempo médio (Cozinha): ${corMedia(media(preparoArr), 15)} min  
+    🍕 Tempo médio (Cozinha): ${corMedia(media(preparoArr), 15)} min  
     <span>| Maior tempo: ${corMedia(maxValido(preparoArr), 15) ?? '-'} min</span>
     <span>| ${totalValidos(preparoArr)} pedidos</span><br><br>
 
@@ -357,7 +357,7 @@ function render() {
 
           <div class="relative group m-2">
             <div class="text-base">
-              ⏱️ Preparo (cozinha): <strong class="${tempoPreparo >= 15 ? 'text-red-600 font-bold' : 'text-green-700 font-bold'}">${tempoPreparo !== null ? tempoPreparo + ' min' : '-'}</strong>
+              🍕 Preparo (cozinha): <strong class="${tempoPreparo >= 15 ? 'text-red-600 font-bold' : 'text-green-700 font-bold'}">${tempoPreparo !== null ? tempoPreparo + ' min' : '-'}</strong>
             </div>
 
             <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 
