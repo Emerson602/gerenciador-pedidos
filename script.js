@@ -433,6 +433,7 @@ function render() {
           <option ${p.entregador === 'Gustavo' ? 'selected' : ''}>Gustavo</option>
           <option ${p.entregador === 'Extra' ? 'selected' : ''}>Extra</option>
           <option ${p.entregador === 'Ifood' ? 'selected' : ''}>Ifood</option>
+          <option ${p.entregador === 'Retirada' ? 'selected' : ''}>Retirada</option>
         </select>
 
           
